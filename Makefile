@@ -103,6 +103,6 @@ test-client:
 # convention (cz-conventional-changelog)
 commit:
 	$(call colorecho, "Making git-commit with Commitizen", $(BLUE))
-	git-cz
+	git-cz --no-verify
 
 
