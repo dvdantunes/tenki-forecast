@@ -1,6 +1,6 @@
 {
   "name": "tenki-forecast",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple app to get local weather",
   "author": "David Antunes <dvdantunes@gmail.com>",
   "homepage": "https://github.com/dvdantunes/tenki-forecast",
@@ -11,8 +11,9 @@
     "yarn": ">=1.5.1"
   },
   "scripts": {
-    "lint-server" : "cd server && yarn lint",
-    "precommit": "yarn lint-server",
+    "lint-server" : "cd server && yarn lint && yarn test",
+    "lint-client" : "cd client && yarn lint && yarn test",
+    "precommit": "yarn lint-server && yarn lint-client",
     "git-cz" : "git-cz"
   },
   "repository": {
