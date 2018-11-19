@@ -10,7 +10,9 @@ CLIENT_PATH=client
 
 # Breaks output
 define breakline
+	@tput setaf 2
 	@echo $1
+	@tput sgr0
 endef
 
 
@@ -40,13 +42,14 @@ clean:
 	$(call colorecho, "Removing installed dependencies and modules", $(RED))
 	rm -rf $(SERVER_PATH)/node_modules
 	rm -rf $(CLIENT_PATH)/node_modules
-	$(call breakline, "")
+	$(call breakline, "できた (Done!)")
 
 
 
 
 # Install the server and client apps
 install: install-base install-server install-client
+	$(call breakline, "できた (Done!)")
 
 
 # Install base dependencies
@@ -81,6 +84,7 @@ run-dev: install
 
 # Run tests
 test: test-server test-client
+	$(call breakline, "できた (Done!)")
 
 
 # Run tests for server app
@@ -103,6 +107,7 @@ test-client:
 # convention (cz-conventional-changelog)
 commit:
 	$(call colorecho, "Making git-commit with Commitizen", $(BLUE))
-	git-cz --no-verify
+	# git-cz --no-verify
+	git-cz
 
 
