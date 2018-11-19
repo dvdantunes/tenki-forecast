@@ -1,18 +1,40 @@
+sudo: required
+dist: xenial
+
 language: node_js
 node_js:
-  - "8.10"
-  - "9.9"
+  - "8.12.0"
+  - "11.1.0"
+
 services:
-  - mongodb
+  - redis
+
 cache:
+  yarn: true
   directories:
-  - node_modules
+    - node_modules
+    - server/node_modules
+    - client/node_modules
+  timeout: 120
+
 git:
   depth: 3
-script:
-  - yarn test:check-coverage
-after_script:
-  - yarn report-coverage
+
+
 before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.5.1
+  # Setting yarn version
+  # @see https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#using-a-specific-yarn-version
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
   - export PATH=$HOME/.yarn/bin:$PATH
+
+install:
+  - make install
+
+script:
+  - make test
+
+after_script:
+  #- make report-coverage
+  - cd ~
+
+
