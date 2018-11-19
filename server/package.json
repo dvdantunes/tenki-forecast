@@ -1,7 +1,7 @@
 {
-  "name": "tenki-forecast",
+  "name": "tenki-forecast-server",
   "version": "0.1",
-  "description": "A simple app to get local weather",
+  "description": "RESTful api server for tenki-forecast app",
   "author": "David Antunes <dvdantunes@gmail.com>",
   "homepage": "https://github.com/dvdantunes/tenki-forecast",
   "main": "index.js",
@@ -16,7 +16,6 @@
     "start:debug": "cross-env DEBUG=tenki-forecast:* yarn start",
     "lint": "esw *.js . config --color",
     "lint:watch": "yarn lint -- --watch",
-    "precommit": "yarn lint && yarn test",
     "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors --recursive './*.js'",
     "test:watch": "yarn test -- --watch",
     "test:coverage": "cross-env NODE_ENV=test ./node_modules/.bin/istanbul cover _mocha -- --ui bdd --reporter spec --colors --recursive './*.js'",
@@ -28,6 +27,10 @@
     "url": "git@github.com:dvdantunes/tenki-forecast.git"
   },
   "keywords": [
+    "weather",
+    "tenki",
+    "weather-forecast",
+    "tenki-forecast",
     "express",
     "node",
     "node.js",
@@ -35,8 +38,7 @@
     "mocha",
     "istanbul",
     "REST",
-    "API",
-    "boilerplate"
+    "API"
   ],
   "dependencies": {
     "bluebird": "3.5.1",
@@ -58,25 +60,16 @@
   },
   "devDependencies": {
     "chai": "4.1.2",
-    "commitizen": "^2.9.6",
     "coveralls": "^3.0.0",
     "cross-env": "5.1.4",
-    "cz-conventional-changelog": "1.2.0",
     "eslint": "3.16.1",
     "eslint-config-airbnb-base": "7.1.0",
     "eslint-plugin-import": "1.16.0",
     "eslint-watch": "2.1.14",
-    "husky": "0.14.3",
-    "istanbul": "1.1.0-alpha.1",
     "mocha": "3.5.0",
     "supertest": "3.0.0",
     "supertest-as-promised": "4.0.2",
     "validate-commit-msg": "^2.14.0"
   },
-  "license": "GPL-3.0",
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  }
+  "license": "GPL-3.0"
 }

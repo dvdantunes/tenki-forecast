@@ -1,0 +1,55 @@
+{
+  "name": "tenki-forecast",
+  "version": "0.1.0",
+  "description": "A simple app to get local weather",
+  "author": "David Antunes <dvdantunes@gmail.com>",
+  "homepage": "https://github.com/dvdantunes/tenki-forecast",
+  "private": false,
+  "engines": {
+    "node": ">=8.10.0",
+    "npm": ">=5.6.0",
+    "yarn": ">=1.5.1"
+  },
+  "scripts": {
+    "lint-server" : "cd server && yarn lint",
+    "precommit": "yarn lint-server",
+    "git-cz" : "git-cz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:dvdantunes/tenki-forecast.git"
+  },
+  "keywords": [
+    "weather",
+    "tenki",
+    "weather-forecast",
+    "tenki-forecast",
+    "express",
+    "node",
+    "node.js",
+    "es6",
+    "mocha",
+    "istanbul",
+    "REST",
+    "API"
+  ],
+  "dependencies": {
+    "debug": "^2.4.5",
+    "dotenv": "^4.0.0"
+  },
+  "devDependencies": {
+    "commitizen": "^3.0.4",
+    "coveralls": "^3.0.0",
+    "cross-env": "5.1.4",
+    "cz-conventional-changelog": "1.2.0",
+    "husky": "0.14.3",
+    "istanbul": "1.1.0-alpha.1",
+    "validate-commit-msg": "^2.14.0"
+  },
+  "license": "GPL-3.0",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
