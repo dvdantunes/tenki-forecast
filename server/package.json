@@ -3,6 +3,7 @@
   "version": "0.1",
   "description": "A simple app to get local weather",
   "author": "David Antunes <dvdantunes@gmail.com>",
+  "homepage": "https://github.com/dvdantunes/tenki-forecast",
   "main": "index.js",
   "private": false,
   "engines": {
@@ -12,7 +13,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "start:debug": "cross-env DEBUG=express-mongoose-es6-rest-api:* yarn start",
+    "start:debug": "cross-env DEBUG=tenki-forecast:* yarn start",
     "lint": "esw *.js server config --color",
     "lint:watch": "yarn lint -- --watch",
     "precommit": "yarn lint && yarn test",
