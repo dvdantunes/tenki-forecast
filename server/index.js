@@ -1,11 +1,10 @@
-// const mongoose = require('mongoose');
-const util = require('util');
+// const util = require('util');
 
 // config should be imported before importing any other file
 const config = require('./config/config');
 const app = require('./config/express');
 
-const debug = require('debug')('tenki-forecast:index');
+// const debug = require('debug')('tenki-forecast:index');
 
 // make bluebird default Promise
 Promise = require('bluebird'); // eslint-disable-line no-global-assign
