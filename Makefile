@@ -62,23 +62,26 @@ install-base:
 # Install server dependencies
 install-server:
 	$(call colorecho, "Installing server dependencies", $(YELLOW))
-	cd $(SERVER_PATH) && yarn
+	cd $(SERVER_PATH) && yarn; mkdir -p logs
 	$(call breakline, "")
 
 
 # Install client dependencies
 install-client:
 	$(call colorecho, "Installing client dependencies", $(YELLOW))
-	cd $(CLIENT_PATH) && yarn
+	cd $(CLIENT_PATH) && yarn; mkdir -p logs
 	$(call breakline, "")
 
 
 
 # Run the app on development env
-run-dev: install
+run-dev: install run-dev-fast
+
+
+# Run the app on development env (no-check)
+run-dev-fast:
 	$(call colorecho, "Running server on development mode", $(GREEN))
 	cd $(SERVER_PATH) && yarn start
-
 
 
 
@@ -107,7 +110,7 @@ test-client:
 # convention (cz-conventional-changelog)
 commit:
 	$(call colorecho, "Making git-commit with Commitizen", $(BLUE))
-	# git-cz --no-verify
-	git-cz
+	git-cz --no-verify
+	# git-cz
 
 
