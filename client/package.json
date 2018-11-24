@@ -12,7 +12,9 @@
     "yarn": ">=1.5.1"
   },
   "scripts": {
-    "start": "node index.js",
+    "dev" : "next",
+    "build" : "next build",
+    "start": "next start",
     "start:debug": "cross-env DEBUG=tenki-forecast:* yarn start",
     "lint": "esw *.js . config --color",
     "lint:watch": "yarn lint -- --watch",
@@ -57,6 +59,11 @@
     "method-override": "^2.3.10",
     "morgan": "1.9.0",
     "winston": "2.4.1",
+    "next": "7.0.2",
+    "@zeit/next-css" : "1.0.1",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "google-map-react": "^1.1.1",
     "@sentry/node": "4.3.2"
   },
   "devDependencies": {
