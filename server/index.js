@@ -1,5 +1,3 @@
-// const util = require('util');
-
 // config should be imported before importing any other file
 const config = require('./config/config');
 const app = require('./config/express');
