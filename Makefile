@@ -1,8 +1,8 @@
 # Makefile rules for development, testing, building and deployment duties
 
 # ENV configuration
-SERVER_PATH=server
-CLIENT_PATH=client
+SERVER_PATH=server/
+CLIENT_PATH=client/
 
 
 
@@ -40,8 +40,8 @@ all: run-dev
 # Remove installed dependencies and modules
 clean:
 	$(call colorecho, "Removing installed dependencies and modules", $(RED))
-	rm -rf $(SERVER_PATH)/node_modules
-	rm -rf $(CLIENT_PATH)/node_modules
+	rm -rf $(SERVER_PATH)node_modules
+	rm -rf $(CLIENT_PATH)node_modules
 	$(call breakline, "できた (Done!)")
 
 
@@ -62,14 +62,14 @@ install-base:
 # Install server dependencies
 install-server:
 	$(call colorecho, "Installing server dependencies", $(YELLOW))
-	cd $(SERVER_PATH) && yarn; mkdir -p logs
+	cd $(SERVER_PATH) && yarn
 	$(call breakline, "")
 
 
 # Install client dependencies
 install-client:
 	$(call colorecho, "Installing client dependencies", $(YELLOW))
-	cd $(CLIENT_PATH) && yarn; mkdir -p logs
+	cd $(CLIENT_PATH) && yarn
 	$(call breakline, "")
 
 
