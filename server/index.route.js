@@ -1,12 +1,12 @@
 const express = require('express');
-const darksky = require('./components/darksky/darksky.controller');
+const tenki = require('./components/tenki/tenki.controller');
 
 
 const router = express.Router(); // eslint-disable-line new-cap
 
 
-/** POST /tenki-forecast - Check service health */
-router.post('/tenki-forecast', darksky.getForecastByLocation);
+/** POST /tenki-forecast - Get forecast data */
+router.post('/tenki-forecast', tenki.getForecastByLocation);
 
 
 

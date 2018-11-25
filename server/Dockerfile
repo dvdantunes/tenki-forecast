@@ -6,9 +6,6 @@ MAINTAINER David Antunes <dvdantunes@gmail.com>
 # Default Env variables
 ENV NODE_ENV=production
 ENV PORT=4040
-ENV DARK_SKY=16f129366152f401a8ed87eb7301647f
-ENV DARK_SKY_TIMEOUT=10000
-
 
 # Create app directory in container and set it as working directory
 RUN mkdir -p /app

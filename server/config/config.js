@@ -20,7 +20,10 @@ if (error) {
 
 const config = {
   env: envVars.NODE_ENV,
-  port: envVars.PORT
+  port: envVars.PORT,
+  gmaps_api_key : 'AIzaSyA53AqsfawEZBHOUi2UjHfKvgi37tl7cXA',
+  dark_sky_api_key : '16f129366152f401a8ed87eb7301647f',
+  request_timeout : 10000
 };
 
 module.exports = config;
