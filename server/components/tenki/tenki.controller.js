@@ -1,7 +1,18 @@
 const request = require('request');
-const DarkSky = require('dark-sky');
+const redisClient = require('../../helpers/redis-client');
 const config = require('../../config/config');
+const DarkSky = require('dark-sky');
 const darksky = new DarkSky(config.dark_sky_api_key);
+
+
+// Set key expiration on 1 hour basis (i.e., 3600 seconds),
+// so the DarkSky data can be queried each hour
+const cacheExpirationPolicyTime = 3600;
+
+
+// Flag to know if data was found on cache
+var cachedDataFound = false;
+
 
 
 /**
@@ -18,17 +29,16 @@ const darksky = new DarkSky(config.dark_sky_api_key);
  */
 function getForecastByLocation(req, res, next) {
 
-  // check on redis
-
+  // Make requests to get weather data for location
   getCountry(req.body.latitude, req.body.longitude)
     .then(data => getCapital(data))
     .then(data => getDarSkyForecast(data, req))
     .then(data => getCountrySeason(data))
+    .then(data => cacheStoreByCountry(data))
     .then(data => res.json({status: 'ok', message: '', data: data}))
-    // store on redis
-    .catch(error_msg => res.json({status: 'error', error_msg: error_msg, data: {}}));
-
+    .catch(error => res.json({status: 'error', error_msg: error, data: {}}));
 }
+
 
 
 /**
@@ -70,16 +80,36 @@ function getCountry(latitude, longitude) {
           // Return response
           try {
 
-            var data = {
-              'country' : {
-                'name' : body.results[0].address_components[0].long_name,
-                'isoCode' : body.results[0].address_components[0].short_name,
-                'latitude' : body.results[0].geometry.location.lat,
-                'longitude' : body.results[0].geometry.location.lng,
-              }
-            }
+            // Get country ISO code
+            var isoCode = body.results[0].address_components[0].short_name;
 
-            resolve(data);
+
+            // Check if the data for the country is already cached and returns it if it's found
+            cacheGetByCountry(isoCode)
+              .then(data => {
+
+                if (data) {
+                  cachedDataFound = true;
+                  console.log(`cachedDataFound for 'country-${isoCode}'`, data);
+
+                } else {
+                  // Data not cached yet
+
+                  data = {
+                    'country' : {
+                      'name' : body.results[0].address_components[0].long_name,
+                      'isoCode' : body.results[0].address_components[0].short_name,
+                      'latitude' : body.results[0].geometry.location.lat,
+                      'longitude' : body.results[0].geometry.location.lng,
+                    }
+                  }
+                }
+
+                resolve(data);
+              })
+              .catch(error => {
+                throw new Error(error);
+              });
 
 
           } catch (e) {
@@ -110,6 +140,13 @@ function getCapital(data) {
   var restCountriesApiUrl = `https://restcountries.eu/rest/v2/alpha/${data.country.isoCode}`;
 
   return new Promise(function(resolve, reject) {
+
+    // Skip promise if data was found on cache
+    if (cachedDataFound) {
+      resolve(data);
+      return;
+    }
+
 
     request(
         { url: restCountriesApiUrl, json: true, timeout: config.request_timeout },
@@ -243,6 +280,13 @@ function getDarSkyForecast(data, req) {
 
   return new Promise(function(resolve, reject) {
 
+    // Skip promise if data was found on cache
+    if (cachedDataFound) {
+      resolve(data);
+      return;
+    }
+
+
     darksky
       .latitude(data.capital.latitude)
       .longitude(data.capital.longitude)
@@ -301,32 +345,6 @@ function getDarSkyForecast(data, req) {
 }
 
 
-/**
- * Get today date on Y-m-d format
- *
- * Note: today date comes from local machine where this code is executed
- *
- * @returns {string}
- */
-function getTodayDate() {
-
-  var d = new Date(),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) {
-    month = '0' + month;
-  }
-
-  if (day.length < 2) {
-    day = '0' + day;
-  }
-
-  return [year, month, day].join('-');
-}
-
-
 
 /**
  * Get season for a country
@@ -338,6 +356,13 @@ function getTodayDate() {
 function getCountrySeason(data) {
 
   return new Promise(function(resolve, reject) {
+
+    // Skip promise if data was found on cache
+    if (cachedDataFound) {
+      resolve(data);
+      return;
+    }
+
 
     try {
 
@@ -371,6 +396,112 @@ function getCountrySeason(data) {
   })
 
 }
+
+
+/**
+ * Get today date on Y-m-d format
+ *
+ * Note: today date comes from local machine where this code is executed
+ *
+ * @returns {string}
+ */
+function getTodayDate() {
+
+  var d = new Date(),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) {
+    month = '0' + month;
+  }
+
+  if (day.length < 2) {
+    day = '0' + day;
+  }
+
+  return [year, month, day].join('-');
+}
+
+
+
+/**
+ * Get cached data on Redis for the location specified
+ *
+ * @param  {string} countryISOCode      Location country ISO code
+ *
+ * @return Promise
+ */
+function cacheGetByCountry(countryISOCode) {
+
+  var key = `country-${countryISOCode}`;
+
+  return new Promise(function(resolve, reject) {
+    resolve(redisGet(key)); // waits for redisGet to resolve
+  });
+}
+
+
+/**
+ * Set cached data on Redis for the location specified
+ *
+ * @param  {string} countryISOCode      Location country ISO code
+ *
+ * @return Promise
+ */
+function cacheStoreByCountry(data) {
+
+  var key = `country-${data.country.isoCode}`;
+
+  return new Promise(function(resolve, reject) {
+    redisSet(key, data); // async
+    resolve(data);
+  });
+}
+
+
+/**
+ * Get key on Redis cache
+ *
+ * @param  {string} key   Cache key
+ *
+ * @return Promise
+ */
+async function redisGet(key) {
+  const rawData = await redisClient.getAsync(key);
+
+  var data;
+  try {
+    data = JSON.parse(rawData);
+
+  } catch (e) {
+    data = null;
+  }
+
+  return data;
+}
+
+
+/**
+ * Set key/value pair on Redis cache
+ *
+ * @param  {string} key     Cache key
+ * @param  {mixed} value    Value
+ * @param
+ *
+ * @return Object|null
+ */
+async function redisSet(key, value, callback) {
+
+  if (typeof value == 'object') {
+    value = JSON.stringify(value);
+  }
+
+  await redisClient.setexAsync(key, cacheExpirationPolicyTime, value);
+
+  return true;
+}
+
 
 
 module.exports = { getForecastByLocation };
