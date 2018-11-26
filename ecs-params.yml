@@ -1,0 +1,26 @@
+# ECS-params configuration
+#
+# Docs:
+# @see https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-ecsparams.html
+# @see https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-create.html
+# @see https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-up.html
+
+version: 1
+
+task_definition:
+  ecs_network_mode: bridge
+  task_role_arn : ECS-task-full-access
+  task_execution_role: ECS-task-full-access
+  task_size:
+    cpu_limit: 1024
+    mem_limit: 2GB
+  services:
+    tenki-forecast-traefik:
+      essential: true
+      cpu_shares: 0
+      mem_reservation: 512
+    tenki-forecast-server:
+      essential: true
+      cpu_shares: 0
+      mem_reservation: 512
+
