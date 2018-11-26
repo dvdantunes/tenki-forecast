@@ -3,6 +3,7 @@
 # ENV configuration
 SERVER_PATH=server/
 CLIENT_PATH=client/
+BIN_PATH=bin/
 
 
 
@@ -103,6 +104,11 @@ test-client:
 	cd $(CLIENT_PATH) && yarn test
 	$(call breakline, "")
 
+
+
+# Deploy entire project
+deploy:
+	./$(BIN_PATH)deploy.sh
 
 
 
