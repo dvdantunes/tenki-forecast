@@ -3,13 +3,16 @@ FROM node:11.2.0-alpine
 
 MAINTAINER David Antunes <dvdantunes@gmail.com>
 
-# Default Env variables
+# Default env variables
 ENV NODE_ENV=production
 ENV PORT=4040
 
 # Create app directory in container and set it as working directory
 RUN mkdir -p /app
 WORKDIR /app
+
+# Create logs directory
+RUN mkdir -p /app/logs
 
 # Only copy package.json initially so that `RUN yarn` layer is recreated only
 # if there are changes in package.json
@@ -25,4 +28,4 @@ COPY . /app/
 EXPOSE 4040
 
 # Command to start service
-CMD [ "yarn", "start" ]
+CMD yarn start
