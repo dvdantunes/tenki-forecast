@@ -23,7 +23,7 @@ const config = {
   port: envVars.PORT,
   gmaps_api_key : 'AIzaSyA53AqsfawEZBHOUi2UjHfKvgi37tl7cXA',
   dark_sky_api_key : '16f129366152f401a8ed87eb7301647f',
-  request_timeout : 10000
+  request_timeout : 10000 // in ms
 };
 
 module.exports = config;

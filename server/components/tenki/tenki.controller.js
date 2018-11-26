@@ -5,28 +5,34 @@ const darksky = new DarkSky(config.dark_sky_api_key);
 
 
 /**
- * Get dark sky forecast by location coordinates
-
+ * Get tenki (weather in japanese) forecast by location coordinates
+ *
+ * @param {Object} req    Request object
+ * @param {Object} res    Response object
+ * @param {Object} next   Next object
+ *
  * @property {string} req.body.latitude - Latitude coordinate
  * @property {string} req.body.longitude - Longitude coordinate
-
+ *
  * @returns {application/json}
  */
 function getForecastByLocation(req, res, next) {
 
-  const time = req.body.time ? req.time : getTodayDate();
+  // check on redis
 
   getCountry(req.body.latitude, req.body.longitude)
     .then(data => getCapital(data))
-    .then(data => darskyForecast(data))
-    .then(data => getSeason(data))
+    .then(data => getDarSkyForecast(data, req))
+    .then(data => getCountrySeason(data))
     .then(data => res.json({status: 'ok', message: '', data: data}))
+    // store on redis
     .catch(error_msg => res.json({status: 'error', error_msg: error_msg, data: {}}));
+
 }
 
 
 /**
- * Get country data from Google Maps
+ * Get country data from Google Maps by reverse geocoding
  *
  * @param  {string} latitude      Request latitude
  * @param  {string} longitude     Request longitude
@@ -62,17 +68,26 @@ function getCountry(latitude, longitude) {
 
 
           // Return response
-          try
-          var data = {
-            'countryData' : {
-              'name' : body.results[0].address_components[0].long_name,
-              'isoCode' : body.results[0].address_components[0].short_name,
-              'latitude' : body.results[0].geometry.location.lat,
-              'longitude' : body.results[0].geometry.location.lng,
+          try {
+
+            var data = {
+              'country' : {
+                'name' : body.results[0].address_components[0].long_name,
+                'isoCode' : body.results[0].address_components[0].short_name,
+                'latitude' : body.results[0].geometry.location.lat,
+                'longitude' : body.results[0].geometry.location.lng,
+              }
             }
+
+            resolve(data);
+
+
+          } catch (e) {
+
+            reject(`Country data cannot be retrieved. Reason: Bad response (${e.message})`)
+            return
           }
 
-          resolve(data);
         }
     );
 
@@ -83,16 +98,16 @@ function getCountry(latitude, longitude) {
 
 
 /**
- * Get country data from Google Maps
+ * Get capital data from Google Maps
  *
- * @param  {string} latitude      Request latitude
- * @param  {string} longitude     Request longitude
+ * @param  {Object} data    Contains country latitude and longitude
  *
  * @return {Promise}
  */
 function getCapital(data) {
 
-  var restCountriesApiUrl = `https://restcountries.eu/rest/v2/alpha/${data.countryData.isoCode}`;
+  // Gets country capital by country ISO code
+  var restCountriesApiUrl = `https://restcountries.eu/rest/v2/alpha/${data.country.isoCode}`;
 
   return new Promise(function(resolve, reject) {
 
@@ -106,19 +121,13 @@ function getCapital(data) {
             return
           }
 
+          // RestCountries returns 400 status code when no data is found
           if (res.statusCode !== 200) {
             reject(`Capital data cannot be retrieved. Response: ${res.statusCode} ${res.statusMessage}`)
             return
           }
 
-          // RestCountries
-          if (body.status == '400') {
-            reject(`Country data cannot be retrieved. Response: ${body.message}`)
-            return
-          }
-
-
-          // Send request to get latitude and longitude
+          // Send request to get country capital latitude and longitude
           // Also, resolves/rejects promise
           getCapitalData(data, body, resolve, reject);
         }
@@ -129,74 +138,93 @@ function getCapital(data) {
 }
 
 
+/**
+ * Makes request to Google Maps to retrieve country capital data
+ *
+ * @param  {string} latitude      Request latitude
+ * @param  {string} longitude     Request longitude
+ *
+ * @return {Promise}
+ */
 function getCapitalData(data, responseBody, resolve, reject) {
 
-  // There are countries that doesn't have capital (eg: AQ (Antarctica), UM, BV) or
-  // Returns country data latitude and longitude
+  // There are countries that doesn't have capital (eg: AQ (Antarctica), UM, BV)
+  // In this scenarios, returns country data latitude and longitude as default data
   //
   // @see http://country.io/capital.json
   // @see https://developers.google.com/public-data/docs/canonical/countries_csv
   // @see https://restcountries.eu/#api-endpoints-code
   // @see https://restcountries.eu/rest/v2/alpha/UM
-  if (responseBody.capital && responseBody.capital.length == 0) {
+  if (!responseBody.capital) {
 
-    var data = {
+    var capitalData = {
+        'capital' : {
+          'name' : 'not-found',
+          'latitude' : data.country.latitude,
+          'longitude' : data.country.longitude
+        }
+      };
+
+    var responseData = {
       ...data,
-      {'capitalData' : {
-        'name' : 'not-found',
-        'latitude' : data.countryData.latitude,
-        'longitude' : data.countryData.longitude
-      }}
+      ...capitalData
     }
 
-    resolve(data);
+    resolve(responseData);
     return
   }
 
-  var gmapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${responseBody.capital}&result_type=country&key=${config.gmaps_api_key}`;
 
+  // Request capital data on Google Maps by geocoding
+  var gmapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${responseBody.capital}&result_type=city&key=${config.gmaps_api_key}`;
   request(
-      { url: rescountriesUrl, json: true, timeout: config.request_timeout },
+      { url: gmapsApiUrl, json: true, timeout: config.request_timeout },
       (err, res, body) => {
 
-        getCapitalData(resolve, reject);
+        // Handle errors
+        if (err) {
+          reject(`Capital data cannot be retrieved. Reason: ${err}`)
+          return
+        }
+
+        if (res.statusCode !== 200) {
+          reject(`Capital data cannot be retrieved. Response: ${res.statusCode} ${res.statusMessage}`)
+          return
+        }
+
+        // Gmaps returns "OK" when it founds results
+        if (body.status != 'OK') {
+          reject(`Capital data cannot be retrieved. Reason: No results found`)
+          return
+        }
+
+
+        // Return response
+        try {
+
+          var capitalData = {
+            "capital" : {
+              'name' : body.results[0].address_components[0].long_name,
+              'latitude' : body.results[0].geometry.location.lat,
+              'longitude' : body.results[0].geometry.location.lng
+            }
+          }
+
+          var responseData = {
+            ...data,
+            ...capitalData
+          }
+
+          resolve(responseData);
+
+
+        } catch (e) {
+          reject(`Capital data cannot be retrieved. Reason: Bad response (${e.message})`)
+          return
+        }
       }
   );
-  // Handle errors
-  if (err) {
-    reject(`Capital data cannot be retrieved. Reason: ${err}`)
-    return
-  }
 
-  if (res.statusCode !== 200) {
-    reject(
-      `Capital data cannot be retrieved. Response: ${res.statusCode} ${
-        res.statusMessage
-      }`
-    )
-    return
-  }
-
-  // Gmaps returns "OK" when it founds results
-  if (body.status != 'OK') {
-    reject(
-      `Country data cannot be retrieved. No results found`
-    )
-    return
-  }
-
-
-  // Return response
-  var data = {
-    "countryData" : {
-      'name' : body.results.0.formatted_address,
-      'iso-code' : body.results.0.address_components.0.short_name,
-      'latitude' : body.results.0.geometry.location.lat,
-      'longitude' : body.results.0.geometry.location.lng,
-    }
-  }
-
-  resolve(data);
 }
 
 
@@ -204,17 +232,21 @@ function getCapitalData(data, responseBody, resolve, reject) {
 /**
  * Get Dark Sky forecast for country capital
  *
- * @param  {Object} data    Contains country capital latitude and longitue
+ * @param  {Object} data    Contains country capital latitude and longitude
+ * @param  {Object} req     Request object
  *
  * @return {Promise}
  */
-function darskyForecast(data) {
+function getDarSkyForecast(data, req) {
+
+  const time = req.body.time ? req.body.time : getTodayDate();
 
   return new Promise(function(resolve, reject) {
 
     darksky
       .latitude(data.capital.latitude)
       .longitude(data.capital.longitude)
+      // .time(time)
       .units('si')
       .language('en')
       .exclude('minutely,hourly,daily')
@@ -234,20 +266,35 @@ function darskyForecast(data) {
           return
         }
 
-        // Prepares response data
-        var data = {
-          ...data,
-          {"weather" : {
-            "temperature" : darkskyResponse.currently.temperature,
-            "summary" : darkskyResponse.currently.summary,
-            "timezone" : darkskyResponse.timezone
-          }}
+
+        // Return response
+        try {
+
+          var weatherData = {
+              'weather' : {
+                'temperature' : darkskyResponse.currently.temperature,
+                'summary' : darkskyResponse.currently.summary,
+                'timezone' : darkskyResponse.timezone,
+                'timeEpoch' : darkskyResponse.currently.time
+              }
+            };
+
+          var responseData = {
+            ...data,
+            ...weatherData
+          };
+
+          resolve(responseData);
+
+
+        } catch (e) {
+          reject(`Dark Sky forecast for country capital cannot be retrieved. Reason: Bad response (${e.message})`)
+          return
         }
 
-        resolve(data);
       })
       .catch(error_msg => {
-        reject(error_msg)
+        reject(`Dark Sky forecast for country capital cannot be retrieved. Reason: ${error_msg}`)
       });
   })
 
@@ -257,8 +304,7 @@ function darskyForecast(data) {
 /**
  * Get today date on Y-m-d format
  *
- * Note: today date comes from local machine where this
- * code is executed
+ * Note: today date comes from local machine where this code is executed
  *
  * @returns {string}
  */
@@ -281,6 +327,50 @@ function getTodayDate() {
 }
 
 
+
+/**
+ * Get season for a country
+ *
+ * @param  {Object} data    Contains country latitude and longitude
+ *
+ * @return {Promise}
+ */
+function getCountrySeason(data) {
+
+  return new Promise(function(resolve, reject) {
+
+    try {
+
+      var seasons;
+
+      // Set today date to current weather time response
+      // Note: ECMAScript handles time in ms, not seconds
+      var today = new Date();
+      today.setTime(data.weather.timeEpoch * 1000);
+
+      // Set season order according to hemisphere
+      if (data.country.latitude >= 0) {
+        // North hemisphere
+        seasons = ['summer', 'autumn', 'winter', 'spring'];
+
+      } else {
+        // South hemisphere
+        seasons = ['winter', 'spring', 'summer', 'autumn'];
+      }
+
+
+      // Get current season and return response
+      data.weather.season = seasons[Math.floor((today.getMonth() / 12 * 4)) % 4];
+      resolve(data);
+
+    } catch (e) {
+      reject(`Country season cannot be retrieved. Reason: Bad response (${e.message})`)
+      return
+    }
+
+  })
+
+}
 
 
 module.exports = { getForecastByLocation };
