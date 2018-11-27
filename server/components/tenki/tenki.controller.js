@@ -29,6 +29,9 @@ var cachedDataFound = false;
  */
 function getForecastByLocation(req, res, next) {
 
+  // Reset flag
+  cachedDataFound = false;
+
   // Make requests to get weather data for location
   getCountry(req.body.latitude, req.body.longitude)
     .then(data => getCapital(data))
@@ -374,13 +377,13 @@ function getCountrySeason(data) {
       today.setTime(data.weather.timeEpoch * 1000);
 
       // Set season order according to hemisphere
-      if (data.country.latitude >= 0) {
+      if (parseFloat(data.country.latitude) >= 0) {
         // North hemisphere
-        seasons = ['summer', 'autumn', 'winter', 'spring'];
+        seasons = ['winter', 'spring', 'summer', 'autumn'];
 
       } else {
         // South hemisphere
-        seasons = ['winter', 'spring', 'summer', 'autumn'];
+        seasons = ['summer', 'autumn', 'winter', 'spring'];
       }
 
 
@@ -454,6 +457,13 @@ function cacheStoreByCountry(data) {
   var key = `country-${data.country.isoCode}`;
 
   return new Promise(function(resolve, reject) {
+
+    // Don't store it if it's already stored
+    if (cachedDataFound) {
+      resolve(data);
+      return;
+    }
+
     redisSet(key, data); // async
     resolve(data);
   });
