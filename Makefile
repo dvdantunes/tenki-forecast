@@ -36,12 +36,13 @@ endef
 
 
 
+
 # Default rule
 all: dev-run
 
 
-# Remove installed dependencies and modules
-dev-clean:
+# Remove local installed dependencies and modules
+clean:
 	$(call colorecho, "Removing installed dependencies and modules", $(RED))
 	rm -rf $(SERVER_PATH)/node_modules
 	rm -rf $(CLIENT_PATH)/node_modules
@@ -49,6 +50,8 @@ dev-clean:
 
 
 
+
+# Local development rules
 
 # Install the server and client apps
 dev-install: dev-install-base dev-install-server dev-install-client
@@ -76,9 +79,8 @@ dev-install-client:
 	$(call breakline, "")
 
 
-
 # Run the app on development env
-dev-run: install run-dev-fast
+dev-run: install dev-fast
 
 
 # Run the app on development env (no-check)
@@ -87,6 +89,50 @@ dev-run-fast:
 	cd $(SERVER_PATH) && yarn start
 
 
+
+
+# Local production rules
+
+
+# Install the server and client apps
+install: dev-install-base dev-install-server dev-install-client
+	$(call breakline, "できた (Done!)")
+
+
+# Install base dependencies
+install-base:
+	$(call colorecho, "Installing base dependencies for development", $(YELLOW))
+	yarn --production
+	$(call breakline, "")
+
+
+# Install server dependencies
+install-server:
+	$(call colorecho, "Installing server dependencies", $(YELLOW))
+	cd $(SERVER_PATH) && yarn --production
+	$(call breakline, "")
+
+
+# Install client dependencies
+install-client:
+	$(call colorecho, "Installing client dependencies", $(YELLOW))
+	cd $(CLIENT_PATH) && yarn --production
+	$(call breakline, "")
+
+
+# Run the app on development env
+run: install run-fast
+
+
+# Run the app on development env (no-check)
+run-fast:
+	$(call colorecho, "Running server on development mode", $(GREEN))
+	cd $(SERVER_PATH) && yarn start
+
+
+
+
+# Test env rules
 
 # Run tests
 test: test-server test-client
@@ -109,9 +155,17 @@ test-client:
 
 
 
+
+# Production env rules
+
 # Setup production env
 setup-production:
 	$(BIN_PATH)/setup.sh
+
+
+# Build project
+build:
+	$(BIN_PATH)/build.sh
 
 
 # Deploy project
@@ -129,7 +183,7 @@ scale-down:
 	$(BIN_PATH)/scale-down.sh
 
 
-# Get env status
+# Get production env status
 status:
 	$(BIN_PATH)/status.sh
 
@@ -140,6 +194,9 @@ remove-production:
 
 
 
+
+
+# Others
 
 # Commit with Commitizen, using AngularJS's commit message
 # convention (cz-conventional-changelog)
