@@ -92,6 +92,7 @@ defaultEntryPoints = ["http", "https"]
 
 
 
+
 ################################################################
 # Backends and services
 ################################################################
@@ -110,7 +111,7 @@ defaultEntryPoints = ["http", "https"]
 # Optional
 # Default: ["default"]
 #
-clusters = ["tenki-2"]
+clusters = ["tenki-forecast-cluster"]
 
 # Enable watch ECS changes.
 #
