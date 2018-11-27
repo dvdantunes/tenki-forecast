@@ -22,7 +22,6 @@ colorecho "Building microservices docker images" $YELLOW
 docker build -t $SERVER_IMAGE:latest $SERVER_PATH
 # docker build -t $CLIENT_IMAGE:latest $CLIENT_PATH
 docker build -t $REVERSE_PROXY_IMAGE:latest $REVERSE_PROXY_PATH
-
 dekita
 breakline
 
