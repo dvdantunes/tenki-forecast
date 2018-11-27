@@ -1,9 +1,10 @@
 # Makefile rules for development, testing, building and deployment duties
 
 # ENV configuration
-SERVER_PATH=server/
-CLIENT_PATH=client/
-BIN_PATH=bin/
+BIN_PATH=./bin
+SERVER_PATH=./server
+CLIENT_PATH=./client
+
 
 
 
@@ -25,6 +26,7 @@ GREEN = 2
 YELLOW = 3
 BLUE = 4
 MAGENTA = 5
+CYAN = 6
 define colorecho
 	@tput setaf $2
 	@echo $1
@@ -35,40 +37,40 @@ endef
 
 
 # Default rule
-all: run-dev
+all: dev-run
 
 
 # Remove installed dependencies and modules
-clean:
+dev-clean:
 	$(call colorecho, "Removing installed dependencies and modules", $(RED))
-	rm -rf $(SERVER_PATH)node_modules
-	rm -rf $(CLIENT_PATH)node_modules
+	rm -rf $(SERVER_PATH)/node_modules
+	rm -rf $(CLIENT_PATH)/node_modules
 	$(call breakline, "できた (Done!)")
 
 
 
 
 # Install the server and client apps
-install: install-base install-server install-client
+dev-install: dev-install-base dev-install-server dev-install-client
 	$(call breakline, "できた (Done!)")
 
 
 # Install base dependencies
-install-base:
-	$(call colorecho, "Installing base dependencies", $(YELLOW))
+dev-install-base:
+	$(call colorecho, "Installing base dependencies for development", $(YELLOW))
 	yarn
 	$(call breakline, "")
 
 
 # Install server dependencies
-install-server:
+dev-install-server:
 	$(call colorecho, "Installing server dependencies", $(YELLOW))
 	cd $(SERVER_PATH) && yarn
 	$(call breakline, "")
 
 
 # Install client dependencies
-install-client:
+dev-install-client:
 	$(call colorecho, "Installing client dependencies", $(YELLOW))
 	cd $(CLIENT_PATH) && yarn
 	$(call breakline, "")
@@ -76,11 +78,11 @@ install-client:
 
 
 # Run the app on development env
-run-dev: install run-dev-fast
+dev-run: install run-dev-fast
 
 
 # Run the app on development env (no-check)
-run-dev-fast:
+dev-run-fast:
 	$(call colorecho, "Running server on development mode", $(GREEN))
 	cd $(SERVER_PATH) && yarn start
 
@@ -106,9 +108,36 @@ test-client:
 
 
 
-# Deploy entire project
+
+# Setup production env
+setup-production:
+	$(BIN_PATH)/setup.sh
+
+
+# Deploy project
 deploy:
-	./$(BIN_PATH)deploy.sh
+	$(BIN_PATH)/deploy.sh
+
+
+# Scale up (turn on)
+scale-up:
+	$(BIN_PATH)/scale-up.sh
+
+
+# Scale down (turn off)
+scale-down:
+	$(BIN_PATH)/scale-down.sh
+
+
+# Get env status
+status:
+	$(BIN_PATH)/status.sh
+
+
+# Remove production env
+remove-production:
+	$(BIN_PATH)/remove.sh
+
 
 
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-# Path to microservices code source
-SERVER_PATH=server/
-CLIENT_PATH=client/
-REVERSE_PROXY_PATH=reverse-proxy/
+# Important paths
+PROJECT_PATH=$PWD
+SERVER_PATH=$PROJECT_PATH/server/
+CLIENT_PATH=$PROJECT_PATH/client/
+REVERSE_PROXY_PATH=$PROJECT_PATH/reverse-proxy/
 
 # Docker images names
 DOCKER_IMAGES_PREFIX=tenki-forecast

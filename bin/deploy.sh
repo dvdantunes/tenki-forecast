@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-# Load env configuration
 BIN_PATH="$PWD/bin"
+
+
+# Load env configuration
 source "$BIN_PATH/env-configuration.sh"
 
 # Load utils
@@ -22,7 +24,7 @@ docker build -t $SERVER_IMAGE:latest $SERVER_PATH
 docker build -t $REVERSE_PROXY_IMAGE:latest $REVERSE_PROXY_PATH
 
 dekita
-
+breakline
 
 
 
@@ -32,6 +34,7 @@ dekita
 colorecho "Getting AWS auth token" $YELLOW
 eval $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
 dekita
+breakline
 
 
 # Check if repository exist for each image and push each image
@@ -48,8 +51,8 @@ do
     breakline
 
     aws ecr list-images --repository-name $IMAGE &> /dev/null
-    last_command_code=$?
 
+    last_command_code=$?
     if [ $last_command_code -eq 0 ];then
        echo "'$IMAGE' repository found"
 
@@ -58,7 +61,7 @@ do
        (aws ecr create-repository --repository-name $IMAGE) || true
     fi
 
-    # eg: 223263753891.dkr.ecr.us-east-1.amazonaws.com/tenki-forecast-server
+    # eg: 223263753891.dkr.ecr.us-east-1.amazonaws.com/tenki-forecast-server:latest
     docker tag $IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE:latest
     docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE:latest
 
@@ -69,19 +72,27 @@ do
         exit 1
     fi
 done
+breakline
+dekita
+breakline
+
+
+
+
+# AWS ECS service deployment
+#
+# Troubleshooting:
+# @see https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-event-messages.html
+# @see https://community.gruntwork.io/t/unable-to-place-a-task-in-ecs/163
+# @see https://stackoverflow.com/questions/36523282/aws-ecs-error-when-running-task-no-container-instances-were-found-in-your-clust
+
+colorecho "Deploying new '$AWS_ECS_CLUSTER_CONFIG' service to Amazon ECS" $YELLOW
+breakline
+
+ecs-cli compose --verbose --file docker-compose.yml --ecs-params ecs-params.yml service down --cluster-config $AWS_ECS_CLUSTER_CONFIG
+breakline
 dekita
 
-
-
-# ecs-cli up --verbose -cluster-config tenki-2 --keypair david --size 2 --instance-type t2.medium --image-id ami-045f1b3f87ed83659 --launch-type EC2 --vpc vpc-03c47a7627e65047b --subnets subnet-0f1713cc8d09256e9,subnet-0374ec6f39de7b754 --security-group sg-0da8056f522b9da5f --instance-role ecsInstanceRole
-
-# ecs-cli compose --verbose --project-name tenki-forecast --file docker-compose.yml --ecs-params ecs-params.yml up --create-log-groups --force-update --cluster-config tenki-2
-
-# ecs-cli ps --cluster-config tenki-2
-
-# ecs-cli compose --verbose --file docker-compose.yml --ecs-params ecs-params.yml down --cluster-config tenki-2
-
-# ecs-cli compose --verbose --file docker-compose.yml --ecs-params ecs-params.yml service up --cluster-config tenki-2
-
-# ecs-cli ps --cluster-config tenki-2
-
+ecs-cli compose --verbose --project-name $AWS_ECS_PROJECT_NAME --file docker-compose.yml --ecs-params ecs-params.yml service up --create-log-groups --force-deployment --cluster-config $AWS_ECS_CLUSTER_CONFIG
+breakline
+dekita

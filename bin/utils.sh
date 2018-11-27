@@ -8,6 +8,7 @@ GREEN=2
 YELLOW=3
 BLUE=4
 MAGENTA=5
+CYAN=6
 
 
 # Breaks output with a empty or custom string
@@ -31,6 +32,5 @@ dekita () {
     tput setaf $GREEN
     echo "できた (Done!)"
     tput sgr0
-    breakline
     breakline
 }
