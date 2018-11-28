@@ -38,6 +38,7 @@ describe('## Main tests', () => {
   });
 
 
+
   describe('# GET /api/tenki-forecast - Good response, chilean coordinates', () => {
     it('Should return "ok" status and expected country and capital weather data', function(done) {
 
@@ -75,11 +76,13 @@ describe('## Main tests', () => {
           done();
         })
         .catch(done);
+
     });
   });
 
 
-  describe('# GET /api/tenki-forecast - Good response, Japan ocean coordinates, no results found', () => {
+
+  describe('# POST /api/tenki-forecast - Error response, Japan ocean coordinates, no results found', () => {
     it('Should return "error" status and "No results found" message', function(done) {
 
       // Set timeout to wait for APIs requests
@@ -107,7 +110,8 @@ describe('## Main tests', () => {
   });
 
 
-  describe('# GET /api/tenki-forecast - Error response, bad coordinates', () => {
+
+  describe('# POST /api/tenki-forecast - Error response, bad coordinates', () => {
     it('Should return "error" status and "400 Bad Request" message', function(done) {
 
       // Set timeout to wait for APIs requests
@@ -135,6 +139,7 @@ describe('## Main tests', () => {
   });
 
 
+
   describe('# Error Handling', () => {
     it('Should handle /api/error throwing error test', (done) => {
       request(app)
@@ -146,19 +151,5 @@ describe('## Main tests', () => {
         })
         .catch(done);
     });
-
-    // it('should handle express validation error - username is required', (done) => {
-    //   request(app)
-    //     .post('/api/users')
-    //     .send({
-    //       mobileNumber: '1234567890'
-    //     })
-    //     .expect(httpStatus.BAD_REQUEST)
-    //     .then((res) => {
-    //       expect(res.body.message).to.equal('"username" is required');
-    //       done();
-    //     })
-    //     .catch(done);
-    // });
   });
 });
