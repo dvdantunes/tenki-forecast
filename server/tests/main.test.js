@@ -140,7 +140,7 @@ describe('## Main tests', () => {
 
 
 
-  describe('# Error Handling', () => {
+  describe('# GET /api/error - Error Handling', () => {
     it('Should handle /api/error throwing error test', (done) => {
       request(app)
         .get('/api/error')
