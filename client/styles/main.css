@@ -3,7 +3,34 @@
 }
 
 
+#app-face {
+  text-align: center;
+  margin: 20px 0;
+  padding: 20px 20px 10px;
+}
+
+#app-face h1 {
+  font-size: 60px;
+  margin-bottom: 60px;
+  font-family: 'Lobster', sans-serif;
+}
+
+#app-face h1 span {
+  margin-left: 20px;
+}
+
+#app-face img {
+  vertical-align: top;
+}
+
+#app-face p {
+  font-size: 19px;
+}
+
+
+
 #map {
   height: 100vh;
   width: 100%;
 }
+

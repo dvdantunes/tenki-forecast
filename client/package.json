@@ -18,7 +18,7 @@
     "start:debug": "cross-env DEBUG=tenki-forecast:* yarn start",
     "lint": "esw *.js . config --color",
     "lint:watch": "yarn lint -- --watch",
-    "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors --recursive './*.js'",
+    "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors --recursive './tests/*.js'",
     "test:watch": "yarn test -- --watch",
     "test:coverage": "cross-env NODE_ENV=test ./node_modules/.bin/istanbul cover _mocha -- --ui bdd --reporter spec --colors --recursive './*.js'",
     "test:check-coverage": "yarn test:coverage && istanbul check-coverage",
@@ -47,6 +47,7 @@
     "@zeit/next-css" : "1.0.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "react-bootstrap": "0.32.4",
     "google-map-react": "^1.1.1",
     "@sentry/node": "4.3.2"
   },

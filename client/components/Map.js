@@ -50,6 +50,7 @@
 
 
 import React, { Component } from 'react';
+import { Grid, Row, Col } from 'react-bootstrap';
 import GoogleMapReact from 'google-map-react';
 import { GMAPS_API_KEY } from '../config';
 
@@ -77,27 +78,60 @@ class Map extends Component {
       lat: 59.95,
       lng: 30.33
     },
-    zoom: 1
+    zoom: 3,
+    zoomControl : false
   };
+
+
+  _onClick = ({x, y, lat, lng, event}) => console.log('_onClick', x, y, lat, lng, event)
+
+
+  _onChildClick = (key, childProps) => {
+    // this.props.onCenterChange([childProps.lat, childProps.lng]);
+    console.log('_onChildClick', key, childProps)
+  }
+
+
 
   render() {
     return (
-      <div id='map'>
-        <GoogleMapReact
-          bootstrapURLKeys={{
-            key: GMAPS_API_KEY,
-            language: 'en'
-          }}
-          defaultCenter={this.props.center}
-          defaultZoom={this.props.zoom}
-        >
-          <SimpleReactComponent
-            lat={59.955413}
-            lng={30.337844}
-            text={'Kreyser Avrora'}
-          />
-        </GoogleMapReact>
-      </div>
+      <Grid>
+        <Row className="show-grid">
+          <Col xs={12} md={12}>
+            <div id='app-face'>
+              <h1>
+                <img src='https://cdn2.iconfinder.com/data/icons/circle-icons-1/64/weather-64.png' />
+                <span>Tenki Forecast</span>
+              </h1>
+
+              <p>Please click on a location to get its current weather data</p>
+            </div>
+          </Col>
+        </Row>
+
+        <Row className="show-grid">
+          <Col xs={12} md={12}>
+            <div id='map'>
+              <GoogleMapReact
+                bootstrapURLKeys={{
+                  key: GMAPS_API_KEY,
+                  language: 'en'
+                }}
+                defaultCenter={this.props.center}
+                defaultZoom={this.props.zoom}
+                onClick={this._onClick}
+                _onChildClick={this._onClick}
+              >
+                <SimpleReactComponent
+                  lat={59.955413}
+                  lng={30.337844}
+                  text={'David Antunes'}
+                />
+              </GoogleMapReact>
+            </div>
+          </Col>
+        </Row>
+      </Grid>
     );
   }
 }
