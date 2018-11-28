@@ -54,6 +54,8 @@ function getForecastByLocation(req, res, next) {
  */
 function getCountry(latitude, longitude) {
 
+  latitude = parseFloat(latitude);
+  longitude = parseFloat(longitude);
   var gmapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&result_type=country&key=${config.gmaps_api_key}`;
 
   return new Promise(function(resolve, reject) {
@@ -140,7 +142,7 @@ function getCountry(latitude, longitude) {
 function getCapital(data) {
 
   // Gets country capital by country ISO code
-  var restCountriesApiUrl = `https://restcountries.eu/rest/v2/alpha/${data.country.isoCode}`;
+  var restCountriesApiUrl = 'https://restcountries.eu/rest/v2/alpha/'+ encodeURIComponent(data.country.isoCode);
 
   return new Promise(function(resolve, reject) {
 
@@ -216,7 +218,8 @@ function getCapitalData(data, responseBody, resolve, reject) {
 
 
   // Request capital data on Google Maps by geocoding
-  var gmapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${responseBody.capital}&result_type=city&key=${config.gmaps_api_key}`;
+  var address = encodeURIComponent(responseBody.capital);
+  var gmapsApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&result_type=city&key=${config.gmaps_api_key}`;
   request(
       { url: gmapsApiUrl, json: true, timeout: config.request_timeout },
       (err, res, body) => {
@@ -239,14 +242,15 @@ function getCapitalData(data, responseBody, resolve, reject) {
         }
 
 
+
         // Return response
         try {
 
           var capitalData = {
             "capital" : {
               'name' : body.results[0].address_components[0].long_name,
-              'latitude' : body.results[0].geometry.location.lat,
-              'longitude' : body.results[0].geometry.location.lng
+              'latitude' : parseFloat(body.results[0].geometry.location.lat),
+              'longitude' : parseFloat(body.results[0].geometry.location.lng)
             }
           }
 
@@ -379,11 +383,11 @@ function getCountrySeason(data) {
       // Set season order according to hemisphere
       if (parseFloat(data.country.latitude) >= 0) {
         // North hemisphere
-        seasons = ['winter', 'spring', 'summer', 'autumn'];
+        seasons = ['Winter', 'Spring', 'Summer', 'Autumn'];
 
       } else {
         // South hemisphere
-        seasons = ['summer', 'autumn', 'winter', 'spring'];
+        seasons = ['Summer', 'Autumn', 'Winter', 'Spring'];
       }
 
 
