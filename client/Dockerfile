@@ -5,7 +5,7 @@ MAINTAINER David Antunes <dvdantunes@gmail.com>
 
 # Default env variables
 ENV NODE_ENV=production
-ENV PORT=4040
+ENV PORT=3000
 
 # Create app directory in container and set it as working directory
 RUN mkdir -p /app
@@ -25,7 +25,7 @@ RUN yarn --production --pure-lockfile
 COPY . /app/
 
 # Expose appropiate port
-EXPOSE 4040
+EXPOSE 3000
 
 # Command to start service
 CMD yarn start

@@ -15,13 +15,33 @@ services:
       - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    # command: --api --docker
     logging:
       driver: awslogs
       options:
         awslogs-group: traefik-reverse-proxy
         awslogs-region: us-east-1
         awslogs-stream-prefix: traefik
-    # command: --api --docker
+
+
+  # Tenki forecast client
+  tenki-forecast-client:
+    # build: ./client
+    image: 223263753891.dkr.ecr.us-east-1.amazonaws.com/tenki-forecast-client:latest
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+      - PORT=4040
+    labels:
+      - traefik.frontend.rule=Path:/
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: tenki-forecast-client
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: client
+
 
   # Tenki forecast server
   tenki-forecast-server:
@@ -30,7 +50,7 @@ services:
     ports:
       - 4040:4040
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=4040
       - REDIS_HOST=tenki-redis-cache.0w3ji1.ng.0001.use1.cache.amazonaws.com
       - REDIS_PORT=6379
