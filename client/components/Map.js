@@ -52,25 +52,12 @@
 import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 import GoogleMapReact from 'google-map-react';
-import { GMAPS_API_KEY } from '../config';
-import { postData } from '../helpers/fetch';
+import fetch from 'unfetch';
+import MapInfoWindow from './Map/MapInfoWindow';
+import { GMAPS_API_KEY, TENKI_FORECAST_SERVER_API_URL } from '../config';
 
 
-const SimpleReactComponent = ({ text }) => (
-  <div style={{
-    color: 'white',
-    background: 'grey',
-    padding: '15px 10px',
-    display: 'inline-flex',
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: '100%',
-    transform: 'translate(-50%, -50%)'
-  }}>
-    {text}
-  </div>
-);
+
 
 
 /**
@@ -98,7 +85,12 @@ class Map extends Component {
     mapTypeControl : false,
     streetViewControl : false,
     fullscreenControl : false,
-    scrollwheel : false
+    scrollwheel : false,
+
+    infoWindowShow : false,
+    infoWindowPositionX: 0,
+    infoWindowPositionY: 0,
+    infoWindowBody: {}
   };
 
 
@@ -109,6 +101,16 @@ class Map extends Component {
    */
   constructor(props) {
     super(props);
+
+    this._onClick = this._onClick.bind(this);
+
+
+    this.state = {
+      infoWindowShow : this.props.infoWindowShow,
+      infoWindowPositionX : this.props.infoWindowPositionX,
+      infoWindowPositionY : this.props.infoWindowPositionY,
+      infoWindowBody : this.props.infoWindowBody
+    }
   }
 
 
@@ -157,88 +159,121 @@ class Map extends Component {
   _onClick = ({x, y, lat, lng, event}) => {
     console.log('_onClick', x, y, lat, lng, event);
 
+    // Center map on clicked area
+    this.props.onCenterChange([lat, lng]);
 
-    this._fetchTenkiWeatherData(lat, lng);
+
+    // Set 'loading' state
+    this.setState({
+        infoWindowShow : true,
+        infoWindowStatus : 'loading',
+        infoWindowPositionX : lat,
+        infoWindowPositionY : lng,
+        infoWindowBody : {}
+      });
+
+
+    // Get weather data and update info window tooltip
+    this._fetchTenkiWeatherData(lat, lng)
+      .then(weatherData => {
+
+        this._updateInfoWindow(weatherData, lat, lng, 'ok');
+      })
+      .catch(error => {
+        // Unexpected errors
+        console.error('error: ', error);
+
+        const weatherData = {
+          'errorMessage' : error.message
+        }
+
+        this._updateInfoWindow(weatherData, lat, lng, 'error');
+      });
   }
 
 
 
+  /**
+   *
+   *
+   */
   _fetchTenkiWeatherData = (lat, lng) => {
+
+    const defaultErrorMessage = "Error retrieving weather data. Please try again.";
+
 
     const postData = {
         "latitude": lat,
         "longitude": lng
       };
 
-    console.log('fetch', postData, JSON.stringify(postData));
+    return fetch(TENKI_FORECAST_SERVER_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+      })
+      .then(response => {
+        // Analyze response
+        console.log('response: ', response.status, response);
 
-    fetch('http://localhost:4040/api/tenki-forecast', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        })
-        .then(response => {
+        if (response.status !== 200){
+          throw new Error(defaultMessage);
+        }
 
-          console.log('response: ', response.status, response);
-
-          if (response.status !== 200){
-            throw new Error('Bad response: ', response.status);
-          }
-
-          return response.json()
-        })
-        .then(responseBody => {
-          //
-
-          const defaultMessage = "Error retrieving weather data. Please try again";
-
-          // const responseBody = response.json();
-          console.log('success: ', responseBody, JSON.stringify(responseBody));
+        return response.json()
+      })
+      .then(responseBody => {
+        // Analyze response body
+        console.log('success: ', responseBody, JSON.stringify(responseBody));
 
 
-          // Handle expected errors
-
-          if (!responseBody
-              || (responseBody.status == 'error'
-                  && !responseBody.message.includes('No results found')))
-          {
-            return defaultMessage;
-          }
-
-
-          // Click on ocean or bad coordinates
-          if (responseBody.status == 'error'
-              && responseBody.message.includes('No results found'))
-          {
-            return `No weather data was found for selected coordinates.`;
-          }
+        // Handle expected errors
+        if (!responseBody
+            || (responseBody.status == 'error'
+                && !responseBody.message.includes('No results found')))
+        {
+          throw new Error(defaultMessage);
+        }
 
 
-          //
-          const country = responseBody.data.country.name;
-          const capital = responseBody.data.capital.name != 'not-found' ? responseBody.data.capital.name : '';
-          const temperature = responseBody.data.weather.temperature +" ºC"
-          const season = responseBody.data.weather.season;
+        // Click on ocean or bad coordinates
+        if (responseBody.status == 'error'
+            && responseBody.message.includes('No results found'))
+        {
+          throw new Error(`No weather data was found for selected coordinates.`);
+        }
 
-          return `${country} - ${capital} - ${temperature} - ${season}`;
-        })
-        .then(message => {
-          // message = `<div class='modal-content'></div>`;
-          console.log('message: ', message);
-        })
-        .catch(error => {
-          // Unexpected errors
-          console.error('error: ', error);
 
-          const defaultMessage = "<div class='modal-content'>"
-                               + "  <p class='modal-header'>Error</p>"
-                               + "  <p class='modal-body'>Error retrieving weather data. Please try again</p>"
-                               + "</div>";
-          console.log('messageError: ', defaultMessage);
-        });
+        // Returns weather data found
+        const weatherData = {
+          country : responseBody.data.country.name,
+          capital : responseBody.data.capital.name != 'not-found' ? responseBody.data.capital.name : '',
+          temperature : responseBody.data.weather.temperature +" ºC",
+          season : responseBody.data.weather.season
+        }
 
+        return weatherData;
+      });
+
+  }
+
+
+
+  /**
+   *
+   *
+   */
+  _updateInfoWindow = (weatherData, lat, lng, status) => {
+
+    this.setState({
+        infoWindowShow : true,
+        infoWindowStatus : status,
+        infoWindowPositionX : lat,
+        infoWindowPositionY : lng,
+        infoWindowBody : weatherData
+      });
   }
 
 
@@ -259,6 +294,14 @@ class Map extends Component {
    *
    */
   render() {
+
+    nfoWindowStatus : status,
+        infoWindowPositionX : lat,
+        infoWindowPositionY : lng,
+        infoWindowBody : weatherData
+    const infoWindowBody = this.state.infoWindowBody;
+    // if (!this.props.loaded) return <div>Loading...</div>;
+
     return (
       <Grid>
         <Row className="show-grid">
@@ -289,10 +332,12 @@ class Map extends Component {
                 onChildClick={this._onChildClick}
                 onChange={this._onChange}
               >
-                <SimpleReactComponent
-                  lat={59.955413}
-                  lng={30.337844}
-                  text={'David Antunes'}
+                <MapInfoWindow
+                  lat={this.state.infoWindowPositionX}
+                  lng={this.state.infoWindowPositionY}
+                  infoWindowShow={this.state.infoWindowShow}
+                  infoWindowStatus={this.state.infoWindowStatus}
+                  infoWindowBody={this.state.infoWindowBody}
                 />
               </GoogleMapReact>
             </div>
@@ -302,5 +347,6 @@ class Map extends Component {
     );
   }
 }
+
 
 export default Map;
