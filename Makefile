@@ -136,7 +136,7 @@ run-fast:
 # Test env rules
 
 # Run tests
-test: test-server test-client
+test: dev-install test-server test-client
 	$(call breakline, "できた (Done!)")
 
 
