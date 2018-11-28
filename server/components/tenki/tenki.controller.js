@@ -39,7 +39,7 @@ function getForecastByLocation(req, res, next) {
     .then(data => getCountrySeason(data))
     .then(data => cacheStoreByCountry(data))
     .then(data => res.json({status: 'ok', message: '', data: data}))
-    .catch(error => res.json({status: 'error', error_msg: error, data: {}}));
+    .catch(error => res.json({status: 'error', message: error, data: {}}));
 }
 
 
@@ -478,13 +478,15 @@ function cacheStoreByCountry(data) {
  * @return Promise
  */
 async function redisGet(key) {
-  const rawData = await redisClient.getAsync(key);
 
   var data;
+
   try {
+    const rawData = await redisClient.getAsync(key);
     data = JSON.parse(rawData);
 
   } catch (e) {
+    console.log('redisGet exception: ', e);
     data = null;
   }
 
@@ -501,13 +503,18 @@ async function redisGet(key) {
  *
  * @return Object|null
  */
-async function redisSet(key, value, callback) {
+async function redisSet(key, value) {
 
   if (typeof value == 'object') {
     value = JSON.stringify(value);
   }
 
-  await redisClient.setexAsync(key, cacheExpirationPolicyTime, value);
+  try {
+    await redisClient.setexAsync(key, cacheExpirationPolicyTime, value);
+
+  } catch (e) {
+    console.log('redisSet exception: ', e);
+  }
 
   return true;
 }
