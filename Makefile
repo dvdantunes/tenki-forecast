@@ -80,7 +80,7 @@ dev-install-client:
 
 
 # Run the app on development env
-dev-run: install dev-fast
+dev-run: dev-install dev-run-fast
 
 
 # Run the app on development env (no-check)
@@ -91,17 +91,18 @@ dev-run-fast:
 
 
 
+
 # Local production rules
 
 
 # Install the server and client apps
-install: dev-install-base dev-install-server dev-install-client
+install: install-base install-server install-client
 	$(call breakline, "できた (Done!)")
 
 
 # Install base dependencies
 install-base:
-	$(call colorecho, "Installing base dependencies for development", $(YELLOW))
+	$(call colorecho, "Installing base dependencies for production", $(YELLOW))
 	yarn --production
 	$(call breakline, "")
 
@@ -120,13 +121,13 @@ install-client:
 	$(call breakline, "")
 
 
-# Run the app on development env
+# Run the app on production env
 run: install run-fast
 
 
-# Run the app on development env (no-check)
+# Run the app on production env (no-check)
 run-fast:
-	$(call colorecho, "Running server on development mode", $(GREEN))
+	$(call colorecho, "Running server on production mode", $(GREEN))
 	cd $(SERVER_PATH) && yarn start
 
 
