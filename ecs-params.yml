@@ -23,6 +23,10 @@ task_definition:
       essential: true
       cpu_shares: 0
       mem_limit: 128m
+    tenki-forecast-client:
+      essential: true
+      cpu_shares: 0
+      mem_limit: 128m
     tenki-forecast-server:
       essential: true
       cpu_shares: 0

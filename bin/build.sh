@@ -22,7 +22,7 @@ source "$BIN_PATH/aws-config.sh"
 colorecho "Building microservices docker images" $YELLOW
 
 docker build -t $SERVER_IMAGE:latest $SERVER_PATH
-# docker build -t $CLIENT_IMAGE:latest $CLIENT_PATH
+docker build -t $CLIENT_IMAGE:latest $CLIENT_PATH
 docker build -t $REVERSE_PROXY_IMAGE:latest $REVERSE_PROXY_PATH
 dekita
 breakline
@@ -41,8 +41,7 @@ breakline
 # Check if repository exist for each image and push each image
 colorecho "Pushing images to Amazon ECR" $YELLOW
 
-# DOCKER_IMAGES = ($SERVER_IMAGE $CLIENT_IMAGE $REVERSE_PROXY_IMAGE)
-DOCKER_IMAGES=( $SERVER_IMAGE $REVERSE_PROXY_IMAGE )
+DOCKER_IMAGES=($SERVER_IMAGE $CLIENT_IMAGE $REVERSE_PROXY_IMAGE)
 
 for IMAGE in "${DOCKER_IMAGES[@]}"
 do
