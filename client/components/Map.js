@@ -1,54 +1,3 @@
-// import React, { Component } from 'react';
-// import Head from 'next/head'
-// import GoogleMapReact from 'google-map-react';
-// import { locations } from '../locations';
-// import { GMAPS_API_KEY } from '../config';
-// import MyGreatPlaceWithHover from '../components/my_great_place_with_hover';
-// import { K_SIZE } from '../components/my_great_place_with_hover_styles';
-
-// const mapCenter = {lat: 38.91131141655464, lng: -77.04375138092037};
-// const marker = ({id}) => (
-//   <div key={id} style={markerStyle}>
-//     {id}
-//   </div>
-// )
-
-// const markers = ( locations, handler ) => {
-//   return locations.map(location => (
-//     <MyGreatPlaceWithHover
-//       text={location.id}
-//       lat={location.lat}
-//       lng={location.lng}
-//     />
-//   ))
-// }
-
-// class Map extends Component {
-
-//   //
-//   static defaultProps = {
-//     center: mapCenter,
-//     zoom: 1
-//   };
-
-//   render() {
-//     return (
-//       <div id='map'>
-//         <GoogleMapReact
-//           bootstrapURLKeys={{ key: GMAPS_API_KEY }}
-//           defaultCenter={this.props.center}
-//           defaultZoom={this.props.zoom}
-//           hoverDistance={K_SIZE / 2}
-//         >
-//           {markers(locations)}
-//         </GoogleMapReact>
-//       </div>
-//     );
-//   }
-// }
-
-
-
 import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 import GoogleMapReact from 'google-map-react';
@@ -58,17 +7,15 @@ import { GMAPS_API_KEY, TENKI_FORECAST_SERVER_API_URL } from '../config';
 
 
 
-
-
 /**
- *
+ * Map React component
  *
  */
 class Map extends Component {
 
 
   /**
-   *
+   * Set default props values
    *
    */
   static defaultProps = {
@@ -96,15 +43,16 @@ class Map extends Component {
 
 
   /**
-   *
+   * Constructor
    *
    */
   constructor(props) {
     super(props);
 
+    // Binds _onClick event
     this._onClick = this._onClick.bind(this);
 
-
+    // Initial state
     this.state = {
       infoWindowShow : this.props.infoWindowShow,
       infoWindowPositionX : this.props.infoWindowPositionX,
@@ -116,10 +64,13 @@ class Map extends Component {
 
 
   /**
+   * Set map control options
    *
    * @see https://developers.google.com/maps/documentation/javascript/reference/map#MapOptions
    * @see https://developers.google.com/maps/documentation/javascript/controls#ControlOptions
    * @see https://developers.google.com/maps/documentation/javascript/examples/control-positioning
+   *
+   * @returns {Object}
    */
   setMapOptions = (maps) => {
     return {
@@ -141,20 +92,22 @@ class Map extends Component {
 
 
   /**
+   * Triggers on changes on zoom and panning
    *
-   *
+   * @returns {void}
    */
   _onChange = (center, zoom, bounds, marginBounds) => {
     // this.props.onCenterChange(center);
     // this.props.onZoomChange(zoom);
-
-    console.log('_onChange', center, bounds, marginBounds);
+    // console.log('_onChange', center, bounds, marginBounds);
   }
 
 
+
   /**
+   * Triggers on map click
    *
-   *
+   * @returns {void}
    */
   _onClick = ({x, y, lat, lng, event}) => {
     console.log('_onClick', x, y, lat, lng, event);
@@ -181,8 +134,8 @@ class Map extends Component {
       })
       .catch(error => {
         // Unexpected errors
-        console.error('error: ', error);
 
+        // console.error('error: ', error);
         const weatherData = {
           'errorMessage' : error.message
         }
@@ -194,8 +147,13 @@ class Map extends Component {
 
 
   /**
+   * Fetch weather data for on Tenki forecast API entrypoint
+   * for the (lat, long) selected
    *
+   * @param {float} lat   Latitude of point on map
+   * @param {float} lng   Longitude of point on map
    *
+   * @returns {Promise}
    */
   _fetchTenkiWeatherData = (lat, lng) => {
 
@@ -216,7 +174,7 @@ class Map extends Component {
       })
       .then(response => {
         // Analyze response
-        console.log('response: ', response.status, response);
+        // console.log('response: ', response.status, response);
 
         if (response.status !== 200){
           throw new Error(defaultErrorMessage);
@@ -226,7 +184,7 @@ class Map extends Component {
       })
       .then(responseBody => {
         // Analyze response body
-        console.log('success: ', responseBody, JSON.stringify(responseBody));
+        // console.log('success: ', responseBody, JSON.stringify(responseBody));
 
 
         // Handle expected errors
@@ -262,8 +220,14 @@ class Map extends Component {
 
 
   /**
+   * Updates infor window tooltip
    *
+   * @param {Object} weatherData    Obtained weather data
+   * @param {float} lat             Latitude of point on map
+   * @param {float} lng             Longitude of point on map
+   * @param {string} status         Response status ('ok', 'error', 'loading')
    *
+   * @returns {void}
    */
   _updateInfoWindow = (weatherData, lat, lng, status) => {
 
@@ -279,7 +243,7 @@ class Map extends Component {
 
 
   /**
-   *
+   * Triggers on children click event
    *
    */
   _onChildClick = (key, childProps) => {
@@ -290,8 +254,11 @@ class Map extends Component {
 
 
   /**
+   * Renders the main map interface
    *
+   * @uses react-bootstrap as HTML templating base
    *
+   * @returns {React-component}
    */
   render() {
 
