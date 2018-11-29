@@ -22,9 +22,9 @@ Also, you can view `Tenki Forecast Server` running on its [demo endpoint](http:/
 
 Finally, you can view `Traefik` routing arquitecture and statistics on:
 
-- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/dashboard
-- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/status
-- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/health
+- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/dashboard/
+- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/dashboard/status/
+- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/health/
 
 
 
