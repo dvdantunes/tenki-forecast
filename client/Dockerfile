@@ -24,6 +24,9 @@ RUN yarn --production --pure-lockfile
 # Copy all file from current dir to /app in container
 COPY . /app/
 
+# Build production env
+RUN yarn build
+
 # Expose appropiate port
 EXPOSE 3000
 
