@@ -17,7 +17,7 @@ The app consist on 2 microservices, both of them containerized with Docker, and 
 
 - `Tenki forecast client`: or the frontend web UI to use the app
 - `Tenki forecast server`: backend that expose an API that fetchs the weather data on public APIs on [Google Maps](https://cloud.google.com/maps-platform/) and [DarkSky](https://darksky.net/dev)
-- `Traefik reverse proxy`: that handles the discovery, routing and exposure of the previous microservices
+- `Traefik reverse proxy`: that uses [Traefik](https://traefik.io/) to handle the discovery, routing and exposure of the previous microservices
 
 
 This documentation will help you to build and deploy them to Amazon ECS, which will run a cluster with an EC2 instance specially optimized to run docker containers.
