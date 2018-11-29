@@ -12,22 +12,19 @@ Yet another amazing simple weather app
 
 ## Demo
 
-You can see Tenki Forecast in action through your browser on its [demo endpoint](http://ec2-54-172-9-142.compute-1.amazonaws.com/)
-
-Also, you can view Traefik on:
-
-http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/dashboard
-http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/status
-http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/health
+You can view `Tenki Forecast` in action through your browser on its [client demo](http://ec2-54-172-9-142.compute-1.amazonaws.com/)
 
 
-Tenki Forecast Server:
-http://ec2-54-172-9-142.compute-1.amazonaws.com/api/tenki-forecast
-
-
-Alternatively, you can request it through `curl`. For example:
+Also, you can view `Tenki Forecast Server` running on its [demo endpoint](http://ec2-54-172-9-142.compute-1.amazonaws.com/api/tenki-forecast). Or you can request it through `curl`. For example:
 
     $ curl -v -H 'Content-Type: application/json' -d '{"latitude":-33.4446699,"longitude":-70.6493836}' -X POST http://ec2-54-172-9-142.compute-1.amazonaws.com/api/tenki-forecast
+
+
+Finally, you can view `Traefik` routing arquitecture and statistics on:
+
+- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/dashboard
+- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/status
+- http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/health
 
 
 
