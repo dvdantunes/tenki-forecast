@@ -201,7 +201,7 @@ function getCapitalData(data, responseBody, resolve, reject) {
 
     var capitalData = {
         'capital' : {
-          'name' : 'not-found',
+          'name' : 'None',
           'latitude' : data.country.latitude,
           'longitude' : data.country.longitude
         }
