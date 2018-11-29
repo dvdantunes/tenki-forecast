@@ -32,9 +32,13 @@ services:
       - 3000:3000
     environment:
       - NODE_ENV=production
-      - PORT=4040
+      - PORT=3000
+      - GMAPS_API_KEY=AIzaSyA53AqsfawEZBHOUi2UjHfKvgi37tl7cXA
+      - TENKI_FORECAST_SERVER_API_URL=http://ec2-54-172-9-142.compute-1.amazonaws.com/api/tenki-forecast
     labels:
-      - traefik.frontend.rule=Path:/
+      - traefik.frontend.rule=PathPrefix:/
+      # @see https://docs.traefik.io/basics/#priorities
+      - traefik.frontend.priority=10
     logging:
       driver: awslogs
       options:
@@ -56,6 +60,8 @@ services:
       - REDIS_PORT=6379
     labels:
       - traefik.frontend.rule=PathPrefix:/api
+      # @see https://docs.traefik.io/basics/#priorities
+      - traefik.frontend.priority=20
     logging:
       driver: awslogs
       options:
