@@ -90,7 +90,7 @@ Also, you will need to install the following tools and technologies:
 
 ## Production building and deployment
 
-Firs of all, you need to activate Amazon ECR, Amazon ECS services and Amazon ElastiCache.
+First of all, you need to activate Amazon ECR, Amazon ECS services and Amazon ElastiCache.
 
 Please adjust your AWS credentials and configuration on `bin/aws-config.sh`. You need to enter a VPC and its Subnets, Security Group and Instance Role.
 
