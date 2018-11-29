@@ -160,7 +160,7 @@ class Map extends Component {
     console.log('_onClick', x, y, lat, lng, event);
 
     // Center map on clicked area
-    this.props.onCenterChange([lat, lng]);
+    // this.props.onCenterChange([lat, lng]);
 
 
     // Set 'loading' state
@@ -219,7 +219,7 @@ class Map extends Component {
         console.log('response: ', response.status, response);
 
         if (response.status !== 200){
-          throw new Error(defaultMessage);
+          throw new Error(defaultErrorMessage);
         }
 
         return response.json()
@@ -234,7 +234,7 @@ class Map extends Component {
             || (responseBody.status == 'error'
                 && !responseBody.message.includes('No results found')))
         {
-          throw new Error(defaultMessage);
+          throw new Error(defaultErrorMessage);
         }
 
 
@@ -294,13 +294,6 @@ class Map extends Component {
    *
    */
   render() {
-
-    nfoWindowStatus : status,
-        infoWindowPositionX : lat,
-        infoWindowPositionY : lng,
-        infoWindowBody : weatherData
-    const infoWindowBody = this.state.infoWindowBody;
-    // if (!this.props.loaded) return <div>Loading...</div>;
 
     return (
       <Grid>

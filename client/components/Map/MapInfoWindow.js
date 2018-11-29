@@ -6,25 +6,22 @@ export default class MapInfoWindow extends React.PureComponent {
     // const style = this.props.$hover ? greatPlaceStyleHover : greatPlaceStyle;
     const mainDivClass = this.props.infoWindowShow ? 'arrow_box' : 'arrow_box hide';
     const status = this.props.infoWindowStatus;
-    const statusOk = status == 'ok' ? true : false;
-    const bodyOkClass = status == 'ok' ? 'body' : 'body hide';
-    const bodyErrorClass = !statusOk ? 'body' : 'body hide';
 
-    var headerText = '';
+    var headerText;
     var bodyOkClass;
     var bodyErrorClass;
     var bodyLoadingClass;
     var capital;
     var temperature;
+    var season;
     var errorMessage;
-    const bodyHideClass = 'body hide';
+    const bodyHideClass = 'hide';
 
     switch (this.props.infoWindowStatus) {
       case 'ok':
         headerText = this.props.infoWindowBody.country;
         bodyOkClass = 'body';
         bodyErrorClass = bodyHideClass;
-        bodyLoadingClass = bodyHideClass;
 
         capital = this.props.infoWindowBody.capital ? this.props.infoWindowBody.capital : '';
         temperature = this.props.infoWindowBody.temperature ? this.props.infoWindowBody.temperature : '';
@@ -36,38 +33,32 @@ export default class MapInfoWindow extends React.PureComponent {
         headerText = 'Error';
         bodyOkClass = bodyHideClass;
         bodyErrorClass = 'body';
-        bodyLoadingClass = bodyHideClass;
 
-        const errorMessage = this.props.infoWindowBody.errorMessage
-                                ? this.props.infoWindowBody.errorMessage : 'Error retrieving weather data. Please try again';
+        errorMessage = this.props.infoWindowBody.errorMessage
+                          ? this.props.infoWindowBody.errorMessage : 'Error retrieving weather data. Please try again';
         break;
 
       case 'loading':
-        headerText = '';
+        headerText = 'Loading...';
         bodyOkClass = bodyHideClass;
         bodyErrorClass = bodyHideClass;
-        bodyLoadingClass = 'body';
 
         break;
     }
 
     return (
-       <div id='mapInfoWindowTooltip' className='{mainDivClass}'>
+       <div id='mapInfoWindowTooltip' className={mainDivClass}>
           <div className='header'>
             {headerText}
           </div>
 
-          <div id='body-loading' className='{bodyLoadingClass}'>
-            <p><b>Loading...</b></p>
-          </div>
-
-          <div id='body-ok' className='{bodyOkClass}'>
+          <div id='body-ok' className={bodyOkClass}>
             <p>Capital: {capital}</p>
             <p>Temperature: {temperature}</p>
             <p>Season: {season}</p>
           </div>
 
-          <div id='body-error' className='{bodyErrorClass}'>
+          <div id='body-error' className={bodyErrorClass}>
             <p>{errorMessage}</p>
           </div>
 
