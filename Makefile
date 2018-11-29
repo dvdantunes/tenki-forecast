@@ -79,14 +79,24 @@ dev-install-client:
 	$(call breakline, "")
 
 
-# Run the app on development env
-dev-run: dev-install dev-run-fast
+# Run the server microservice on local development env
+dev-run-server: install dev-run-server-fast
 
 
-# Run the app on development env (no-check)
-dev-run-fast:
-	$(call colorecho, "Running server on development mode", $(GREEN))
+# Run the server microservice on local development env (no-check)
+dev-run-server-fast:
+	$(call colorecho, "Running server on local development mode", $(GREEN))
 	cd $(SERVER_PATH) && yarn start
+
+
+# Run the server microservice on local development env
+dev-run-client: install dev-run-client-fast
+
+
+# Run the client microservice on local development env (no-check)
+dev-run-client-fast:
+	$(call colorecho, "Running client on development production mode", $(GREEN))
+	cd $(CLIENT_PATH) && yarn dev
 
 
 
@@ -121,14 +131,24 @@ install-client:
 	$(call breakline, "")
 
 
-# Run the app on production env
-run: install run-fast
+# Run the server microservice on local production env
+run-server: install run-server-fast
 
 
-# Run the app on production env (no-check)
-run-fast:
-	$(call colorecho, "Running server on production mode", $(GREEN))
-	cd $(SERVER_PATH) && yarn start
+# Run the server microservice on local production env (no-check)
+run-server-fast:
+	$(call colorecho, "Running server on local production mode", $(GREEN))
+	cd $(SERVER_PATH) && NODE_ENV=production yarn start
+
+
+# Run the server microservice on local production env
+run-client: install run-client-fast
+
+
+# Run the client microservice on local production env (no-check)
+run-client-fast:
+	$(call colorecho, "Running client on local production mode", $(GREEN))
+	cd $(CLIENT_PATH) && yarn build && yarn start
 
 
 
@@ -197,7 +217,7 @@ remove-production:
 
 
 
-# Others
+# Other rules
 
 # Commit with Commitizen, using AngularJS's commit message
 # convention (cz-conventional-changelog)

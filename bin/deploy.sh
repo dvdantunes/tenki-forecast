@@ -45,7 +45,7 @@ dekita
 
 # We need to sleep a little so down process can scale down the current service
 # and avoid "InvalidParameterException: Unable to Start a service that is still Draining." error
-sleep 3
+sleep 10
 
 
 # Deploying new service
