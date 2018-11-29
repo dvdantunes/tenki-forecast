@@ -13,7 +13,7 @@ Yet another amazing simple weather app
 
 ## Quick Start
 
-The app consist on 2 microservices, each of them containarized with Docker, and a reverse proxy, that manages the discovery and routing activities. They were named as follow:
+The app consist on 2 microservices, both of them containerized with Docker, and a reverse proxy, that manages the discovery and routing activities for both microservices. They were named as follow:
 
 - `Tenki forecast client`: or the frontend web UI to use the app
 - `Tenki forecast server`: backend that expose an API that fetchs the weather data on public APIs on [Google Maps](https://cloud.google.com/maps-platform/) and [DarkSky](https://darksky.net/dev)
