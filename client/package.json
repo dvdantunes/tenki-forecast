@@ -43,8 +43,11 @@
     "API"
   ],
   "dependencies": {
+    "fs" : "latest",
     "cors": "2.8.4",
     "unfetch": "^4.0.1",
+    "dotenv": "^4.0.0",
+    "express": "4.16.3",
     "next": "7.0.2",
     "@zeit/next-css" : "1.0.1",
     "react": "^16.6.3",
