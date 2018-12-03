@@ -26,19 +26,19 @@ This documentation will help you to build and deploy them to Amazon ECS, which w
 
 ## Demo
 
-You can see `Tenki forecast client` in action through your browser on its [demo web UI](http://ec2-54-172-9-142.compute-1.amazonaws.com/)
+You can see `Tenki forecast client` in action through your browser on its [demo web UI](http://ec2-18-207-108-90.compute-1.amazonaws.com/)
 
 
-Also, you can reach `Tenki forecast server` running on its [demo API entrypoint](http://ec2-54-172-9-142.compute-1.amazonaws.com/api/tenki-forecast). You need to request it through `POST` method. For example:
+Also, you can reach `Tenki forecast server` running on its [demo API entrypoint](http://ec2-18-207-108-90.compute-1.amazonaws.com/api/tenki-forecast). You need to request it through `POST` method. For example:
 
-    $ curl -v -H 'Content-Type: application/json' -d '{"latitude":-33.4446699,"longitude":-70.6493836}' -X POST http://ec2-54-172-9-142.compute-1.amazonaws.com/api/tenki-forecast
+    $ curl -v -H 'Content-Type: application/json' -d '{"latitude":-33.4446699,"longitude":-70.6493836}' -X POST http://ec2-18-207-108-90.compute-1.amazonaws.com/api/tenki-forecast
 
 
 Finally, you can view `Traefik reverse proxy` routing architecture and statistics on:
 
-- [Dashboard](http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/dashboard/)
-- [Requests status](http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/dashboard/status/)
-- [Health statistics](http://ec2-54-172-9-142.compute-1.amazonaws.com:8080/health/)
+- [Dashboard](http://ec2-18-207-108-90.compute-1.amazonaws.com:8080/dashboard/)
+- [Requests status](http://ec2-18-207-108-90.compute-1.amazonaws.com:8080/dashboard/status/)
+- [Health statistics](http://ec2-18-207-108-90.compute-1.amazonaws.com:8080/health/)
 
 
 
